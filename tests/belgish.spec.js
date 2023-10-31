@@ -7,7 +7,7 @@ test("has title", async ({ page }) => {
   await expect(page).toHaveTitle(/Belgisch Advies/);
 });
 
-test("get started link", async ({ page }) => {
+test("Get Started Link", async ({ page }) => {
   await page.goto("https://belgischadvies.be/isolatie/");
   // Click the get started link.
   await page
@@ -35,24 +35,39 @@ test("get started link", async ({ page }) => {
 
   // Get all available options
   const options = await page.$$(".multiselect__element");
-
-  // Select a random option
-  const randomIndex = Math.floor(Math.random() * options.length);
-  const randomOption = options[randomIndex];
+  const randomOption = options[1];
   await randomOption.click();
 
-  // Verify that the selected option is visible
-  const selectedOptionText = await randomOption.innerText();
-  const selectedOptionVisible = await page.isVisible(
-    `.multiselect__element:has-text("${selectedOptionText}")`
-  );
-  await expect(selectedOptionVisible).toBe(true);
-
-  // const click_btn = await page.getByPlaceholder('Volgende');
   await page.getByRole("button").click();
 
-  await page.getByRole("progressbar", { name: "50%" });
+  // Vraag 2 van 4
+  page.getByText("Bent u eigenaar van de woning?");
+  const varag_2 = ".custom-control-label";
+  await page.waitForSelector(varag_2);
+  await page.click(varag_2);
+
+  // Vraag 3 van 4
+  page.getByText("Type woning");
+  const varag_3 = await page.$$(".check-item");
+  const varag_3_index = Math.floor(Math.random() * varag_3.length)
+  const varag_3_option = varag_3[varag_3_index]
+  await varag_3_option.click();
+
+  // Vraag 4 van 4
+  page.getByText("Wat wil je isoleren?");
+  const varag_4 = await page.$$(".check-item");
+  const varag_index = varag_4[1]
+  await varag_index.click();
+
+  // Next Button
+  await page.getByRole("button").click();
+
+  // Model Button
+  await page.getByRole("button").click();
+
+  page.getByText("Uit welk materiaal bestaat je gevel?")
+  const uit_wel = await page.$$('.check-item')
+  const uit_index = uit_wel[0]
+  await uit_index.click()
 
 });
-
-
