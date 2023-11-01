@@ -1,5 +1,6 @@
 // @ts-check
 const { test, expect } = require("@playwright/test");
+test.describe.configure({ mode: "serial" });
 
 test("has title", async ({ page }) => {
   await page.goto("https://belgischadvies.be/isolatie/");
@@ -110,8 +111,8 @@ test("Negative : Input Fields Values", async ({ page }) => {
   if (options.length === -1) {
     console.log("No Vlaues");
   } else {
-    const random_option = Math.floor(Math.random() * options.length)
-    const random_values = options[random_option]
+    const random_option = Math.floor(Math.random() * options.length);
+    const random_values = options[random_option];
     await random_values.click();
     await page.getByRole("button").click();
   }
@@ -249,4 +250,68 @@ test("Negative: All Input Fields Vlaues", async ({ page }) => {
     console.log("Drop Down Error", drop_down_content);
     await page.getByRole("button").click();
   }
+});
+
+test("Positive: Click on the Arrow", async ({ page }) => {
+  await page.goto("https://belgischadvies.be/isolatie/");
+  // Click the get started link.
+  await page.getByRole("button", { name: "START DE GRATIS woningSCAN!" }).click();
+
+  // Expects page to have a heading with the name of Installation.
+  await expect(page.getByText("Wat is jouw adres?")).toBeVisible();
+
+  //Click the PostCode with values
+  const get_post = await page.getByPlaceholder("Postcode");
+  await get_post.fill("1200");
+
+  //Click the Huisnr. with values
+  const get_huisnr = await page.getByPlaceholder("Huisnr.");
+  await get_huisnr.fill("12");
+
+  // Click in the Straatnaam || Click on the dropdown field
+  const dropdownSelector = ".multiselect__tags"; // Adjust the selector based on your HTML structure
+  await page.click(dropdownSelector);
+
+  // Wait for the dropdown options to be visible
+  const dropdownOptionsSelector = ".multiselect__content";
+  await page.waitForSelector(dropdownOptionsSelector);
+
+  // Get all available options
+  const options = await page.$$(".multiselect__element");
+  const randomOption = options[3];
+  await randomOption.click();
+
+  await page.getByRole("button").click();
+
+  
+  // Vraag 2 van 4
+  page.getByText("Bent u eigenaar van de woning?");
+  const varag_2 = ".custom-control-label";
+  await page.waitForSelector(varag_2);
+  await page.locator('img[alt="arrow"]').click()
+  await page.getByRole("button").click()
+
+  // // Vraag 3 van 4
+  // page.getByText("Type woning");
+  // const varag_3 = await page.$$(".check-item");
+  // const varag_3_index = Math.floor(Math.random() * varag_3.length);
+  // const varag_3_option = varag_3[varag_3_index];
+  // await varag_3_option.click();
+
+  // // Vraag 4 van 4
+  // page.getByText("Wat wil je isoleren?");
+  // const varag_4 = await page.$$(".check-item");
+  // const varag_index = varag_4[1];
+  // await varag_index.click();
+
+  // // Next Button
+  // await page.getByRole("button").click();
+
+  // // Model Button
+  // await page.getByRole("button").click();
+
+  // page.getByText("Uit welk materiaal bestaat je gevel?");
+  // const uit_wel = await page.$$(".check-item");
+  // const uit_index = uit_wel[0];
+  // await uit_index.click();
 });
